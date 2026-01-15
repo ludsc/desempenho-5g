@@ -7,10 +7,15 @@ RUN apt update && \
     rm -rf /var/lib/apt/lists/*
 
 # Repositório Open5GS (necessário para arquivos do WebUI)
-RUN add-apt-repository ppa:open5gs/latest -y && \
+RUN curl -fsSL https://packages.open5gs.org/open5gs.gpg | \
+    gpg --dearmor -o /usr/share/keyrings/open5gs.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/open5gs.gpg] \
+    https://packages.open5gs.org/ubuntu jammy main" \
+    > /etc/apt/sources.list.d/open5gs.list && \
     apt update && \
     apt install -y open5gs && \
     rm -rf /var/lib/apt/lists/*
+
 
 # Node.js 20
 RUN mkdir -p /etc/apt/keyrings && \
