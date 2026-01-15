@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  mongo:
+    build:
+      context: .
+      dockerfile: Dockerfile.mongo
+    container_name: open5gs-mongo
+    volumes:
+      - mongo_data:/data/db
+
+  webui:
+    build:
+      context: .
+      dockerfile: Dockerfile.webui
+    container_name: open5gs-webui
+    depends_on:
+      - mongo
+    ports:
+      - "3000:3000"
+
+volumes:
+  mongo_data:

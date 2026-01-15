@@ -1,0 +1,24 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt update && \
+    apt install -y gnupg curl ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Chave e repositório MongoDB
+RUN curl -fsSL https://pgp.mongodb.com/server-8.0.asc | \
+    gpg --dearmor -o /usr/share/keyrings/mongodb-server-8.0.gpg && \
+    echo "deb [arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg] \
+    https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/8.0 multiverse" \
+    > /etc/apt/sources.list.d/mongodb-org-8.0.list
+
+RUN apt update && \
+    apt install -y mongodb-org && \
+    rm -rf /var/lib/apt/lists/*
+
+# Porta padrão Mongo
+EXPOSE 27017
+
+# MongoDB em foreground (OBRIGATÓRIO em Docker)
+CMD ["mongod", "--bind_ip_all"]

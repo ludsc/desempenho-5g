@@ -1,0 +1,36 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt update && \
+    apt install -y gnupg curl ca-certificates software-properties-common && \
+    rm -rf /var/lib/apt/lists/*
+
+# Repositório Open5GS (necessário para arquivos do WebUI)
+RUN add-apt-repository ppa:open5gs/latest -y && \
+    apt update && \
+    apt install -y open5gs && \
+    rm -rf /var/lib/apt/lists/*
+
+# Node.js 20
+RUN mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | \
+    gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] \
+    https://deb.nodesource.com/node_20.x nodistro main" \
+    > /etc/apt/sources.list.d/nodesource.list && \
+    apt update && \
+    apt install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
+# Instala WebUI (SEM systemctl)
+RUN sed -i "s|localhost:27017|mongo:27017|g" \
+    /opt/open5gs/webui/config/config.js
+
+RUN curl -fsSL https://open5gs.org/open5gs/assets/webui/install | bash -
+
+EXPOSE 3000
+
+WORKDIR /opt/open5gs/webui
+
+CMD ["npm", "start"]
