@@ -6,16 +6,9 @@ RUN apt update && \
     apt install -y curl gnupg ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# ---- Open5GS (PPA manual, sem add-apt-repository) ----
-RUN curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3C3A3F43C1EEC7F4" \
-    | gpg --dearmor -o /usr/share/keyrings/open5gs.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/open5gs.gpg] \
-    http://ppa.launchpad.net/open5gs/latest/ubuntu jammy main" \
-    > /etc/apt/sources.list.d/open5gs.list
-
-RUN apt update && \
-    apt install -y open5gs && \
-    rm -rf /var/lib/apt/lists/*
+RUN add-apt-repository ppa:open5gs/latest -y && \
+    apt update && \
+    apt install -y open5gs
 
 # ---- Node.js ----
 RUN mkdir -p /etc/apt/keyrings && \
